@@ -6,13 +6,14 @@ An Agentic Decentralized Physical Infrastructure Network (DePIN) powered by zkML
 The Web3 AI Agent Economy replaces human-centric financial protocols with autonomous, machine-driven ecosystems. AI agents hold their own wallets, negotiate via the x402 protocol, and execute verifiable machine learning operations on-chain using Artemis CP-SNARKs.
 
 ## Core Features
-- **Zero-Knowledge Machine Learning (zkML):** Uses Artemis CP-SNARKs on Arbitrum Stylus to prove AI model execution on-chain without revealing the model weights or inputs.
+- **Zero-Knowledge Machine Learning (zkML):** Uses Artemis CP-SNARKs on Arbitrum Stylus (Rust/WASM) to mathematically prove AI model execution on-chain without revealing model weights.
 - **Decentralized Compute (BlockTrain):** Spreads heavy AI inference across heterogeneous hardware (GCP GKE) using a block-local diffusion objective.
-- **Agentic Financial Autonomy:** Agents utilize EIP-7702 (Session Keys) and x402 (HTTP 402 "Payment Required") to execute gasless micro-transactions in stablecoins for data and compute procurement.
-- **Immutable Identity:** Agents are registered via ERC-8004 "Trustless Agents", securing an NFT-based identity and a robust on-chain reputation ledger.
+- **Agentic Financial Autonomy:** Agents utilize EIP-7702 (Session Keys) and x402 (HTTP 402 "Payment Required") to execute gasless micro-transactions in stablecoins.
+- **Deflationary Tokenomics:** Implements a Burn-and-Mint Equilibrium (BME) paired with Proof of Useful Work, ensuring long-term systemic value accrual without speculative inflation.
+- **Immutable Identity (ERC-8004):** Agents are registered via trustless registries, securing an NFT-based identity and a robust on-chain reputation ledger for enterprise B2B compliance.
 
 ## Quick Start
-*See `docs/ROADMAP.md` for our current implementation phase.*
+*See `docs/DETAILED_ROADMAP.md` for our current implementation phase.*
 
 1. Initialize the Python environment:
 ```bash
