@@ -4,9 +4,24 @@ import time
 import pytest
 import asyncio
 import pytest_asyncio
+import urllib.request
+import json
 from dotenv import load_dotenv
 from web3 import Web3
 from eth_account import Account
+
+def emit_telemetry(event_type: str, data: dict):
+    """Broadcasts events to the React Dashboard via FastAPI Bridge."""
+    try:
+        req = urllib.request.Request(
+            'http://localhost:8000/emit', 
+            data=json.dumps({"type": event_type, "data": data}).encode(),
+            headers={'Content-Type': 'application/json'},
+            method='POST'
+        )
+        urllib.request.urlopen(req, timeout=1)
+    except Exception:
+        pass # Fail silently if dashboard server isn't running
 
 # Optional Live GCP Imports - handled dynamically
 try:
@@ -34,6 +49,7 @@ class LiveGCPCompute:
 
     async def create_instance(self):
         print(f"\n[LIVE GCP API] Initiating L4 Spot Provisioning sequence...")
+        emit_telemetry("status_update", {"message": "Provisioning GCP Spot Node..."})
         if not self.project_id:
             print("[WARN] GCP_PROJECT_ID not found. Simulating live provision.")
             self.successful_zone = "us-central1-a"
@@ -92,6 +108,9 @@ class LiveGCPCompute:
                     )
                     print(f"[LIVE GCP API] ⏳ Request sent to {zone}. Waiting for instance... Operation: {operation.name}")
                     self.successful_zone = zone
+                    emit_telemetry("node_status", {
+                        "node": {"id": self.instance_name, "region": zone, "status": "Provisioning...", "rep": 100}
+                    })
                     return self
                 except Exception as e:
                     if "ZONE_RESOURCE_POOL_EXHAUSTED" in str(e) or "not available" in str(e).lower():
@@ -107,6 +126,9 @@ class LiveGCPCompute:
         print(f"[LIVE GCP API] Polling instance status in {self.successful_zone}...")
         await asyncio.sleep(2)
         print("[LIVE GCP API] ✅ Instance running and SSH ready.")
+        emit_telemetry("node_status", {
+            "node": {"id": self.instance_name, "region": self.successful_zone, "status": "Active", "rep": 100}
+        })
 
     async def delete_instance(self):
         if not self.project_id or not self.successful_zone:
@@ -121,6 +143,9 @@ class LiveGCPCompute:
                 instance=self.instance_name
             )
             print(f"[LIVE GCP API] Deletion operation initiated: {operation.name}")
+            emit_telemetry("node_status", {
+                "node": {"id": self.instance_name, "region": self.successful_zone, "status": "Deleted", "rep": 100}
+            })
         except Exception as e:
             print(f"[LIVE GCP API] ERROR deleting instance: {e}")
 
@@ -150,6 +175,8 @@ def generate_with_waterfall(prompt: str):
     
     # Vertex AI model names (no 'gemini-' prefix is needed for some, but standard is fine)
     waterfall_sequence = ["gemini-3.5-flash", "gemini-2.5-pro", "gemini-2.5-flash"]
+    
+    emit_telemetry("status_update", {"message": "Generating CP-SNARK via Gemini..."})
     
     for model_name in waterfall_sequence:
         print(f"[VERTEX AI] Attempting inference with {model_name}...")
@@ -196,6 +223,7 @@ async def test_live_artemis_gauntlet(live_gcp_spot_instance):
 
     # 3. Live On-Chain Settlement via Arbitrum RPC
     print("\nConstructing EIP-7702 Type 0x04 Transaction...")
+    emit_telemetry("status_update", {"message": "Broadcasting to Arbitrum Sepolia..."})
     
     if ARBITRUM_RPC_URL and BURNER_PRIVATE_KEY:
         w3 = Web3(Web3.HTTPProvider(ARBITRUM_RPC_URL))
@@ -239,3 +267,7 @@ async def test_live_artemis_gauntlet(live_gcp_spot_instance):
     print("\n" + "="*60)
     print("--- LIVE E2E Gauntlet Passed ---")
     print("="*60)
+    emit_telemetry("status_update", {"message": "Gauntlet Completed Successfully!"})
+    
+    # Emit a BME tick to show the tokenomics burning
+    emit_telemetry("bme_tick", {"burned": 100, "minted": 95, "supply": 99999995})

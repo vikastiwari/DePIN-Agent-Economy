@@ -1,56 +1,82 @@
 import React, { useState, useEffect } from 'react';
-import { Activity, Cpu, Coins, ShieldCheck, Server, Zap } from 'lucide-react';
+import { Activity, Cpu, Coins, ShieldCheck, Server, Zap, Globe, Blocks } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { JsonRpcProvider, formatUnits } from 'ethers';
 import './App.css';
-
-// Simulated live stream data for the BME Deflationary Engine
-const generateMockData = () => {
-  const data = [];
-  let currentSupply = 100000000;
-  for (let i = 0; i < 20; i++) {
-    const burned = Math.floor(Math.random() * 500) + 100;
-    // BME Ratio: 95 minted for every 100 burned
-    const minted = Math.floor(burned * 0.95);
-    currentSupply = currentSupply - burned + minted;
-    data.push({
-      time: `-${20 - i}m`,
-      burned,
-      minted,
-      supply: currentSupply
-    });
-  }
-  return data;
-};
-
-const mockNodes = [
-  { id: 'node-0x8792', region: 'us-central1-a', type: 'L4 Spot', status: 'Active', rep: 124, uptime: '99.9%' },
-  { id: 'node-0x4a1b', region: 'us-east4-b', type: 'L4 Spot', status: 'Active', rep: 89, uptime: '99.7%' },
-  { id: 'node-0x9f3e', region: 'us-east1-c', type: 'L4 Spot', status: 'Active', rep: 256, uptime: '100%' },
-];
 
 function App() {
   const [bmeData, setBmeData] = useState([]);
+  const [nodes, setNodes] = useState([]);
+  const [networkInfo, setNetworkInfo] = useState({ blockNumber: 0, baseFee: '0' });
+  const [backendStatus, setBackendStatus] = useState("Waiting for E2E Script...");
   
+  // 1. Connect to Live Arbitrum Sepolia Testnet
   useEffect(() => {
-    setBmeData(generateMockData());
+    // Official Arbitrum Sepolia Public RPC
+    const provider = new JsonRpcProvider('https://sepolia-rollup.arbitrum.io/rpc');
     
-    // Simulate real-time updates every 3 seconds
-    const interval = setInterval(() => {
-      setBmeData(prev => {
-        const newData = [...prev.slice(1)];
-        const last = prev[prev.length - 1];
-        const burned = Math.floor(Math.random() * 500) + 100;
-        const minted = Math.floor(burned * 0.95);
-        newData.push({
-          time: 'Live',
-          burned,
-          minted,
-          supply: last.supply - burned + minted
+    const fetchNetworkData = async () => {
+      try {
+        const blockNumber = await provider.getBlockNumber();
+        const feeData = await provider.getFeeData();
+        const baseFee = feeData.gasPrice ? formatUnits(feeData.gasPrice, 'gwei') : '0';
+        
+        setNetworkInfo({
+          blockNumber,
+          baseFee: parseFloat(baseFee).toFixed(4)
         });
-        return newData;
-      });
-    }, 3000);
+      } catch (err) {
+        console.error("Web3 Connection Error:", err);
+      }
+    };
+
+    fetchNetworkData();
+    const interval = setInterval(fetchNetworkData, 12000); // Arbitrum block time is fast, poll every 12s
     return () => clearInterval(interval);
+  }, []);
+
+  // 2. Connect to Python Backend WebSockets
+  useEffect(() => {
+    const ws = new WebSocket('ws://localhost:8000/ws');
+    
+    ws.onopen = () => {
+      console.log("Connected to Python E2E Backend.");
+    };
+
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      
+      if (data.type === 'bme_tick') {
+        setBmeData(prev => {
+          const newData = [...prev];
+          if (newData.length > 20) newData.shift();
+          newData.push({
+            time: new Date().toLocaleTimeString(),
+            burned: data.burned,
+            minted: data.minted,
+            supply: data.supply
+          });
+          return newData;
+        });
+      } else if (data.type === 'node_status') {
+        setNodes(prev => {
+          // Update or add node
+          const exists = prev.find(n => n.id === data.node.id);
+          if (exists) {
+            return prev.map(n => n.id === data.node.id ? data.node : n);
+          }
+          return [...prev, data.node];
+        });
+      } else if (data.type === 'status_update') {
+        setBackendStatus(data.message);
+      }
+    };
+
+    ws.onclose = () => {
+      console.log("WebSocket disconnected.");
+    };
+
+    return () => ws.close();
   }, []);
 
   return (
@@ -60,9 +86,15 @@ function App() {
           <Zap className="text-accent-blue" size={32} />
           Web3 AI Agent Economy
         </h1>
-        <div className="status-badge animate-pulse">
-          <div className="status-dot"></div>
-          Arbitrum Testnet Connected
+        <div style={{ display: 'flex', gap: '1rem' }}>
+          <div className="status-badge">
+            <Globe size={16} />
+            E2E Server: {backendStatus}
+          </div>
+          <div className="status-badge animate-pulse">
+            <div className="status-dot"></div>
+            Arbitrum Sepolia
+          </div>
         </div>
       </header>
 
@@ -70,31 +102,31 @@ function App() {
       <div className="grid-top">
         <div className="glass-panel">
           <div className="metric-title">
-            <Activity size={18} className="text-accent-green" />
-            Network TPS (Agents)
+            <Blocks size={18} className="text-accent-green" />
+            Live Block Number
           </div>
           <div className="metric-value">
-            2,451 <span className="metric-unit">tx/s</span>
+            {networkInfo.blockNumber.toLocaleString()}
           </div>
         </div>
 
         <div className="glass-panel">
           <div className="metric-title">
-            <Cpu size={18} className="text-accent-blue" />
+            <Activity size={18} className="text-accent-blue" />
+            Network Base Fee
+          </div>
+          <div className="metric-value">
+            {networkInfo.baseFee} <span className="metric-unit">Gwei</span>
+          </div>
+        </div>
+
+        <div className="glass-panel">
+          <div className="metric-title">
+            <Cpu size={18} className="text-accent-green" />
             Active GCP Nodes
           </div>
           <div className="metric-value">
-            14 <span className="metric-unit">L4 GPUs</span>
-          </div>
-        </div>
-
-        <div className="glass-panel">
-          <div className="metric-title">
-            <Coins size={18} className="text-accent-green" />
-            Deflationary Burn Rate
-          </div>
-          <div className="metric-value">
-            4.8 <span className="metric-unit">WAIB/sec</span>
+            {nodes.filter(n => n.status === 'Active').length} <span className="metric-unit">L4 GPUs</span>
           </div>
         </div>
       </div>
@@ -110,7 +142,7 @@ function App() {
             </h2>
           </div>
           <p style={{ color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>
-            For every 100 WAIB tokens burned for inference, exactly 95 are algorithmically minted.
+            Awaiting streaming events from Python Gauntlet...
           </p>
           
           <div className="chart-container">
@@ -145,33 +177,39 @@ function App() {
           <div className="flex justify-between items-center mb-4">
             <h2 className="metric-title" style={{ fontSize: '1rem', color: '#f8fafc', marginBottom: 0 }}>
               <Server size={18} className="text-accent-blue" />
-              GCP Node Fleet
+              Live GCP Node Fleet
             </h2>
           </div>
           <p style={{ color: 'var(--color-text-muted)', fontSize: '0.875rem', marginBottom: '1rem' }}>
-            Live reputation scores synced from ERC-8004 Registry.
+            Instances spawned by the Artemis Gauntlet script.
           </p>
 
-          <table className="node-table">
-            <thead>
-              <tr>
-                <th>Node ID</th>
-                <th>Region</th>
-                <th>Reputation</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {mockNodes.map((node) => (
-                <tr key={node.id}>
-                  <td style={{ fontFamily: 'monospace' }}>{node.id}</td>
-                  <td>{node.region}</td>
-                  <td><span className="reputation-score">+{node.rep}</span></td>
-                  <td style={{ color: 'var(--color-sol-green)' }}>{node.status}</td>
+          {nodes.length === 0 ? (
+            <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--color-text-muted)' }}>
+              No active nodes. Run the E2E script!
+            </div>
+          ) : (
+            <table className="node-table">
+              <thead>
+                <tr>
+                  <th>Node ID</th>
+                  <th>Region</th>
+                  <th>Reputation</th>
+                  <th>Status</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {nodes.map((node) => (
+                  <tr key={node.id}>
+                    <td style={{ fontFamily: 'monospace' }}>{node.id}</td>
+                    <td>{node.region}</td>
+                    <td><span className="reputation-score">+{node.rep}</span></td>
+                    <td style={{ color: node.status === 'Active' ? 'var(--color-sol-green)' : 'var(--color-text-muted)' }}>{node.status}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
           
           <div style={{ marginTop: '2rem', padding: '1rem', background: 'rgba(255,255,255,0.02)', borderRadius: '8px', border: '1px solid var(--color-border)' }}>
              <h3 style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
