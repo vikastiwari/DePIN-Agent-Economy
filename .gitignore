@@ -7,3 +7,5 @@ verifier/target/
 .env
 docs/LEGAL_COMPLIANCE.md
 docs/PRODUCTION_PLAYBOOK.md
+scratch/
+contracts/broadcast/

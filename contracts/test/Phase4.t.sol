@@ -69,13 +69,17 @@ contract Phase4Test is Test {
         // Starts at 0
         assertEq(reputation.getReputation(tokenId), 0);
 
-        // Record a success (+1)
+        // Record a success (+100 based on diminishing returns: 100 * (10000-0)/10000)
         reputation.recordSuccess(tokenId);
-        assertEq(reputation.getReputation(tokenId), 1);
+        assertEq(reputation.getReputation(tokenId), 100);
 
-        // Record a failure (-5)
+        // Record a second success (+99 based on diminishing returns: 100 * (10000-100)/10000)
+        reputation.recordSuccess(tokenId);
+        assertEq(reputation.getReputation(tokenId), 199);
+
+        // Record a failure (20% slash, but MIN_SLASH is 200. Since 200 >= 199, score becomes 0)
         reputation.recordFailure(tokenId);
-        assertEq(reputation.getReputation(tokenId), -4); // Aggressive penalty applied
+        assertEq(reputation.getReputation(tokenId), 0); // Aggressive penalty bounds to 0
     }
 
     // 3. Subscription Manager Tests

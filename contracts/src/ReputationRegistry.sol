@@ -12,10 +12,15 @@ contract ReputationRegistry {
     AgentIdentity public identityContract;
     address public owner;
     
-    // Maps TokenID to Reputation Score
-    mapping(uint256 => int256) public reputationScores;
+    uint256 public constant MAX_REPUTATION = 10000;
+    uint256 public constant BASE_REWARD = 100;
+    uint256 public constant SLASH_PERCENTAGE = 20; // 20%
+    uint256 public constant MIN_SLASH = 200;
 
-    event ReputationUpdated(uint256 indexed tokenId, int256 newScore, bool isPositive);
+    // Maps TokenID to Reputation Score
+    mapping(uint256 => uint256) public reputationScores;
+
+    event ReputationUpdated(uint256 indexed tokenId, uint256 newScore, bool isPositive);
 
     constructor(address _identityContract) {
         owner = msg.sender;
@@ -27,7 +32,7 @@ contract ReputationRegistry {
         _;
     }
 
-    function getReputation(uint256 tokenId) external view returns (int256) {
+    function getReputation(uint256 tokenId) external view returns (uint256) {
         // Reverts if token doesn't exist
         identityContract.ownerOf(tokenId); 
         return reputationScores[tokenId];
@@ -35,20 +40,50 @@ contract ReputationRegistry {
 
     /**
      * @dev Called by BME/Verifier upon successful CP-SNARK generation.
+     * Uses diminishing returns: (MAX_REP - CURRENT_REP) / MAX_REP * BASE_REWARD
      */
     function recordSuccess(uint256 tokenId) external onlyOwner {
         identityContract.ownerOf(tokenId); 
-        reputationScores[tokenId] += 1;
-        emit ReputationUpdated(tokenId, reputationScores[tokenId], true);
+        
+        uint256 currentScore = reputationScores[tokenId];
+        uint256 reward = (BASE_REWARD * (MAX_REPUTATION - currentScore)) / MAX_REPUTATION;
+        
+        // Ensure at least 1 point is given unless they are perfectly at MAX
+        if (reward == 0 && currentScore < MAX_REPUTATION) {
+            reward = 1;
+        }
+
+        uint256 newScore = currentScore + reward;
+        if (newScore > MAX_REPUTATION) {
+            newScore = MAX_REPUTATION;
+        }
+        
+        reputationScores[tokenId] = newScore;
+        emit ReputationUpdated(tokenId, newScore, true);
     }
 
     /**
      * @dev Called by BME/Verifier upon a failed or malicious CP-SNARK verification.
-     * Punished heavily to enforce SLA.
+     * Slashes 20% of current reputation or MIN_SLASH, whichever is higher.
      */
     function recordFailure(uint256 tokenId) external onlyOwner {
         identityContract.ownerOf(tokenId); 
-        reputationScores[tokenId] -= 5;
-        emit ReputationUpdated(tokenId, reputationScores[tokenId], false);
+        
+        uint256 currentScore = reputationScores[tokenId];
+        uint256 slashAmount = (currentScore * SLASH_PERCENTAGE) / 100;
+        
+        if (slashAmount < MIN_SLASH) {
+            slashAmount = MIN_SLASH;
+        }
+
+        uint256 newScore;
+        if (slashAmount >= currentScore) {
+            newScore = 0;
+        } else {
+            newScore = currentScore - slashAmount;
+        }
+
+        reputationScores[tokenId] = newScore;
+        emit ReputationUpdated(tokenId, newScore, false);
     }
 }

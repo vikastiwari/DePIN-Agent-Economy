@@ -248,7 +248,7 @@ async def test_live_artemis_gauntlet(live_gcp_spot_instance):
         ).build_transaction({
             'from': account.address,
             'gas': 100000,
-            'gasPrice': w3.eth.gas_price,
+            'gasPrice': int(w3.eth.gas_price * 1.5),
             'nonce': w3.eth.get_transaction_count(account.address),
             'chainId': 421614
         })

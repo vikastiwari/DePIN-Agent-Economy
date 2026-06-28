@@ -1,27 +1,51 @@
-// Stubbed for local testing. In production Stylus, use #![no_std]
-#![allow(unused)]
+// In a production Stylus deployment, uncomment `#![no_std]` and `extern crate alloc;`
+// #![no_std]
+// extern crate alloc;
 
 pub mod math;
 
-/// In a real Stylus contract, we use #[stylus::external] and alloy_primitives.
-/// Here we stub the interface to compile natively for testing the mathematics.
+use alloy_primitives::U256;
+use math::{G1Point, G2Point, verify_pairing};
+
+#[cfg(feature = "stylus-sdk")]
+use stylus_sdk::prelude::*;
+
+// Define the contract state struct
+#[cfg(feature = "stylus-sdk")]
+#[stylus_sdk::prelude::sol_storage]
+#[stylus_sdk::prelude::entrypoint]
 pub struct ArtemisVerifier;
 
+#[cfg(not(feature = "stylus-sdk"))]
+pub struct ArtemisVerifier;
+
+/// In a real Stylus contract, we use #[stylus::external] and alloy_primitives.
+/// Here we conditionally compile it or provide a native Rust implementation.
+#[cfg_attr(feature = "stylus-sdk", stylus_sdk::prelude::external)]
 impl ArtemisVerifier {
     /// Verifies a CP-SNARK proof.
-    /// This function acts as the entry point for the Arbitrum Stylus contract.
-    pub fn verify_cp_snark(proof: &[u8], public_inputs: &[u8]) -> bool {
-        // Step 1: Parse proof and inputs (stub)
-        if proof.is_empty() || public_inputs.is_empty() {
+    /// ABI matches standard Solidity verifiers: verifyProof(uint256[2], uint256[2][2], uint256[2], uint256[])
+    pub fn verify_proof(
+        &self,
+        a: [U256; 2],
+        b: [[U256; 2]; 2],
+        c: [U256; 2],
+        pub_inputs: Vec<U256>,
+    ) -> bool {
+        let g1_a = G1Point { x: a[0], y: a[1] };
+        let g2_b = G2Point { 
+            x: [b[0][0], b[0][1]], 
+            y: [b[1][0], b[1][1]] 
+        };
+        let g1_c = G1Point { x: c[0], y: c[1] };
+
+        // Step 1: Parse proof and inputs
+        if pub_inputs.is_empty() {
             return false;
         }
 
-        // Step 2: Use Montgomery multiplication to verify elliptic curve pairings
-        // (Delegated to math::montgomery_mul for optimized WASM performance)
-        let result = math::montgomery_mul(100, 200, 331);
-        
-        // Return true if pairing checks pass
-        result > 0
+        // Step 2: Use pairing logic to verify zero knowledge proof
+        verify_pairing(&g1_a, &g2_b, &g1_c, &pub_inputs)
     }
 }
 
@@ -31,15 +55,30 @@ mod tests {
 
     #[test]
     fn test_verify_valid_proof() {
-        let proof = [1, 2, 3];
-        let inputs = [4, 5, 6];
-        assert!(ArtemisVerifier::verify_cp_snark(&proof, &inputs));
+        let verifier = ArtemisVerifier;
+        let a = [U256::from(1), U256::from(2)];
+        let b = [
+            [U256::from(1), U256::from(2)],
+            [U256::from(3), U256::from(4)],
+        ];
+        let c = [U256::from(5), U256::from(6)];
+        let inputs = vec![U256::from(1)];
+        
+        assert!(verifier.verify_proof(a, b, c, inputs));
     }
 
     #[test]
     fn test_verify_invalid_proof() {
-        let proof = [];
-        let inputs = [];
-        assert!(!ArtemisVerifier::verify_cp_snark(&proof, &inputs));
+        let verifier = ArtemisVerifier;
+        // Zero points represent an invalid/empty proof
+        let a = [U256::from(0), U256::from(0)];
+        let b = [
+            [U256::from(0), U256::from(0)],
+            [U256::from(0), U256::from(0)],
+        ];
+        let c = [U256::from(0), U256::from(0)];
+        let inputs = vec![];
+        
+        assert!(!verifier.verify_proof(a, b, c, inputs));
     }
 }
