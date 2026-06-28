@@ -12,6 +12,7 @@ class AgentState(TypedDict):
     payment_instructions: Optional[dict]
     signature: Optional[str]
     error: Optional[str]
+    private_key: Optional[str]
 
 # Node 1: Request Data
 def fetch_data(state: AgentState) -> dict:
@@ -45,16 +46,24 @@ def fetch_data(state: AgentState) -> dict:
 
 # Node 2: Authorize Payment
 def authorize_payment(state: AgentState) -> dict:
+    from eth_account import Account
+    from eth_account.messages import encode_defunct
     print("--> [Agent] Processing x402 payment instructions...")
     instr = state.get("payment_instructions", {})
     amount = instr.get("amount")
     recipient = instr.get("recipient")
     
-    print(f"--> [Agent] Generating EIP-3009 gasless signature to pay {amount} to {recipient}...")
-    # In reality, this would use a Web3 library to sign an EIP-712/EIP-3009 payload with the agent's session key.
-    mock_signature = f"mock_signature_for_{amount}_to_{recipient}"
+    private_key = state.get("private_key")
+    if private_key:
+        print(f"--> [Agent] Generating cryptographic EIP-712/EIP-7702 signature to pay {amount} to {recipient}...")
+        message = encode_defunct(text=f"pay_{amount}_{recipient}")
+        signed_message = Account.sign_message(message, private_key=private_key)
+        signature = "0x" + signed_message.signature.hex()
+    else:
+        print(f"--> [Agent] Generating mock signature to pay {amount} to {recipient}...")
+        signature = f"mock_signature_for_{amount}_to_{recipient}"
     
-    return {"signature": mock_signature}
+    return {"signature": signature}
 
 # Router Logic
 def router(state: AgentState) -> str:
@@ -92,7 +101,8 @@ if __name__ == "__main__":
         needs_payment=False,
         payment_instructions=None,
         signature=None,
-        error=None
+        error=None,
+        private_key=None
     )
     
     result = app.invoke(initial_state)
