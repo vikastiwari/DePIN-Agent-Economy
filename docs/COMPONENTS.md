@@ -17,5 +17,6 @@
 - **x402 Client (`agent_client.py`):** The module responsible for intercepting HTTP 402s and generating cryptographic EIP-712 payment signatures via `eth_account` for EIP-7702 delegation.
 
 ## 3. Compute Engine (`/compute`)
-- **BlockTrain Inference (`blocktrain.py`):** The localized AI inference engine utilizing PyTorch/Hugging Face to run models in a decentralized hardware topology (funded via GCP Web3 Startups program).
+- **BlockTrain Inference (`blocktrain.py`):** The localized AI inference engine utilizing PyTorch/Hugging Face to run models in a decentralized hardware topology (funded via GCP Web3 Startups program). 
+  - **Hardware & Models:** Targets 8B parameter models (Llama-3-8B, Mistral-7B) utilizing AWQ and GGUF 4-bit/8-bit quantization on GCP L4 nodes for sub-2.5s proof-generation latency.
 - **Artemis Prover (`prover.py`):** The off-chain Rust/Python hybrid module that generates the Zero-Knowledge proofs for the AI computation using homomorphic polynomial commitments.

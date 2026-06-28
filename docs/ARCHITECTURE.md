@@ -6,9 +6,10 @@ The Web3 AI Agent Economy architecture is highly decoupled, isolating computatio
 ## The Three Pillars
 
 ### 1. Off-Chain Inference Engine (GCP & BlockTrain)
-- **Framework:** PyTorch, Hugging Face, LangChain, LangGraph.
-- **Hardware:** GCP Kubernetes Engine (GKE) running L4/H100 instances (Subsidized via GCP Web3 Startup Scale Tier).
-- **Mechanism:** Implements "Spheroid BlockTrain", splitting models into independently trainable blocks using block-local diffusion objectives. This enables highly distributed serving of 70B+ parameter models.
+- **Framework:** PyTorch/Hugging Face running on a decentralized topology of GCP GKE nodes (funded by Google Cloud Web3 Startups program).
+- **Optimization Strategy:** We utilize AWQ and GGUF 4-bit/8-bit quantization on GCP L4 nodes to maximize memory bandwidth and ensure our Artemis CP-SNARK prover achieves sub-2.5 second latency.
+- **Model Target:** Highly distributed serving of 8B parameter models (e.g., Llama-3-8B-Instruct, Mistral-7B).
+- **Mechanism:** Implements "Spheroid BlockTrain", splitting models into independently trainable blocks using block-local diffusion objectives. 
 
 ### 2. On-Chain Verification & Settlement (Arbitrum Stylus)
 - **Framework:** Rust (WASM), Solidity, Foundry.

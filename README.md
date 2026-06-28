@@ -17,19 +17,26 @@ The Web3 AI Agent Economy framework is engineered to replace human-centric finan
 - **Immutable Identity (ERC-8004):** Agents are authenticated via trustless registries, securing an NFT-based identity and an immutable on-chain reputation ledger to satisfy enterprise B2B compliance requirements.
 
 ## Quick Start
-*See `docs/DETAILED_ROADMAP.md` for our current implementation phase.*
+## Quick Start (Engineering Verification)
 
-1. Initialize the Python environment:
+### 1. Smart Contract Test-Driven Development (TDD)
+We utilize [Foundry](https://book.getfoundry.sh/) for all EVM logic, including EIP-7702, BME Tokenomics, and ERC-8004 Registries.
 ```bash
-python3 -m venv venv
+cd contracts
+forge install
+forge test -vvv
+```
+
+### 2. Arbitrum Stylus Verifier Compilation
+The Artemis CP-SNARK verifier is written in `#![no_std]` Rust. You must use the `cargo-stylus` CLI to compile it to WASM within the 24KB limit.
+```bash
+cd verifier
+cargo stylus check
+```
+
+### 3. Agent Protocol Networking
+To test the off-chain Python x402 flow and cryptographic signatures:
+```bash
 source venv/bin/activate
-pip install -r requirements.txt
-```
-2. Run the Mock x402 Server (Terminal 1):
-```bash
-uvicorn mock_server:app --port 8000
-```
-3. Run the Agent Client (Terminal 2):
-```bash
-python agent_client.py
+pytest tests/
 ```

@@ -25,7 +25,7 @@ This document outlines the precise, step-by-step strategy to transition the Web3
 
 ---
 
-## Phase 3: Tokenomics Engineering & Testnet (Status: COMPLETE)
+## Phase 3: Tokenomics Engineering & Testnet (Status: IN VERIFICATION)
 *Building the Deflationary Economic Engine.*
 
 ### 3.1 Burn-and-Mint Equilibrium (BME)
@@ -38,19 +38,21 @@ This document outlines the precise, step-by-step strategy to transition the Web3
 
 ---
 
-## Phase 4: Enterprise B2B SaaS Rollout (Status: COMPLETE)
+## Phase 4: Enterprise B2B SaaS Rollout (Status: PENDING)
 *Securing real-world fiat cash flow from Web2 corporations.*
 
 ### 4.1 ERC-8004 Trustless Agent Integration
-- **Achievement:** Deployed `AgentIdentity.sol` to mint NFTs for compute nodes, and `ReputationRegistry.sol` to mathematically penalize failures (-5) and reward successes (+1).
-- Every GCP compute node now has an immutable on-chain track record of its uptime and proof-generation success rate.
+- **Achievement:** Built `AgentIdentity.sol` to mint NFTs for compute nodes, and `ReputationRegistry.sol` to mathematically penalize failures (-5) and reward successes (+1).
+- Every GCP compute node will have an immutable on-chain track record of its uptime and proof-generation success rate.
 
 ### 4.2 SaaS Tiers
-  - Dedicated ERC-8004 agent whitelisting for IP protection.
+- **Achievement:** Built `SubscriptionManager.sol` to bridge real-world fiat cash flows via stablecoins (USDC).
+- **Enterprise Shared Tier ($5,000 / month):** Automatically provisions shared L4 instances.
+- **Institutional Dedicated Tier ($25,000 / month):** Automatically provisions isolated H100 pods.
 
 ---
 
-## Phase 5: Protocol Mainnet & TGE (Status: COMPLETE)
+## Phase 5: Protocol Mainnet & TGE (Status: PENDING)
 *Launching the deflationary utility framework.*
 
 ### 5.1 Legal & Security Auditing
