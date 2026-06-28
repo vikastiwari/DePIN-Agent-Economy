@@ -24,6 +24,10 @@ The Web3 AI Agent Economy architecture is highly decoupled, isolating computatio
   - Agent A uses its EIP-7702 delegated smart account session key (Transaction type 0x04) to sign a gasless batch transaction.
   - The payment flows through an ERC-4337 Arbitrum paymaster, automatically participating in the Burn-and-Mint Equilibrium (BME) tokenomics model.
 
+### 4. Testing & Verification Methodology (TDD)
+- **Framework:** `pytest` (Python), `forge test` (Foundry/Solidity), and `cargo test` (Rust).
+- **Protocol:** Test-Driven Development (TDD) is strictly enforced. All Smart Contracts and Python state graphs must be accompanied by comprehensive unit tests asserting expected state transitions, negative cases (e.g., failed signatures), and simulated EIP-7702 delegations *before* execution logic is finalized. Code coverage must remain above 95%.
+
 ## High-Level Diagram
 
 ```mermaid

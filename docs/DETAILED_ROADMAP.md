@@ -1,6 +1,6 @@
 # DETAILED ROADMAP: The Master Revenue & Scaling Plan
 
-This document outlines the precise, step-by-step strategy to transition the Web3 AI Agent Economy from a Phase 1 Proof-of-Concept into a legally compliant, grant-funded, billion-dollar ecosystem on Arbitrum Stylus.
+This document outlines the precise, step-by-step strategy to transition the Web3 AI Agent Economy from a Phase 1 Proof-of-Concept into a legally compliant, grant-funded, and highly scalable DePIN ecosystem on Arbitrum Stylus.
 
 ---
 
@@ -23,7 +23,7 @@ This document outlines the precise, step-by-step strategy to transition the Web3
 
 ### 2.2 Google Cloud Web3 Startup Scale Tier ($200k Credits)
 - **Requirement:** Must secure the Arbitrum grant first to prove "foundation funding" eligibility.
-- **Action:** Apply for the Scale Tier using an official domain email. Emphasize that our Spheroid BlockTrain inference on PyTorch requires massive L4/H100 GPU consumption, guaranteeing rapid utilization of the $200k credits.
+- **Action:** Apply for the Scale Tier using an official domain email. Emphasize that our Spheroid BlockTrain inference on PyTorch requires high-throughput L4/H100 GPU consumption, guaranteeing rapid utilization of the $200k credits.
 
 ---
 
