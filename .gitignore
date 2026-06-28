@@ -1,1 +1,6 @@
 venv/
+__pycache__/
+.pytest_cache/
+contracts/out/
+contracts/cache/
+verifier/target/
