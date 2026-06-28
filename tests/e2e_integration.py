@@ -39,6 +39,11 @@ ARBITRUM_RPC_URL = os.getenv("ARBITRUM_RPC_URL")
 BURNER_PRIVATE_KEY = os.getenv("BURNER_PRIVATE_KEY")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
+UTILITY_TOKEN_ADDRESS = os.getenv("UTILITY_TOKEN_ADDRESS")
+BME_ADDRESS = os.getenv("BME_ADDRESS")
+
+ERC20_ABI = json.loads('[{"constant":false,"inputs":[{"name":"_to","type":"address"},{"name":"_value","type":"uint256"}],"name":"transfer","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"}]')
+
 class LiveGCPCompute:
     """Live Google Cloud Compute API integration with L4 Zone Cascading."""
     def __init__(self, project_id):
@@ -225,35 +230,44 @@ async def test_live_artemis_gauntlet(live_gcp_spot_instance):
     print("\nConstructing EIP-7702 Type 0x04 Transaction...")
     emit_telemetry("status_update", {"message": "Broadcasting to Arbitrum Sepolia..."})
     
-    if ARBITRUM_RPC_URL and BURNER_PRIVATE_KEY:
+    if ARBITRUM_RPC_URL and BURNER_PRIVATE_KEY and UTILITY_TOKEN_ADDRESS:
         w3 = Web3(Web3.HTTPProvider(ARBITRUM_RPC_URL))
         assert w3.is_connected(), "Failed to connect to Arbitrum RPC"
         
         account = Account.from_key(BURNER_PRIVATE_KEY)
-        print(f"[WEB3] Connected to Arbitrum live node.")
+        print(f"[WEB3] Connected to Arbitrum Sepolia Live Node.")
         print(f"[WEB3] Broadcasting from Burner EOA: {account.address}")
         
-        # Real tx simulation - this will throw insufficient funds exactly as intended
-        try:
-            tx = {
-                'to': account.address,
-                'value': w3.to_wei(0, 'ether'),
-                'gas': 21000,
-                'gasPrice': w3.eth.gas_price,
-                'nonce': w3.eth.get_transaction_count(account.address),
-                'chainId': 421614 # Arbitrum Sepolia
-            }
-            signed_tx = w3.eth.account.sign_transaction(tx, private_key=BURNER_PRIVATE_KEY)
-            print("[WEB3] Transaction Signed. Sending raw transaction...")
-            tx_hash = w3.eth.send_raw_transaction(signed_tx.raw_transaction)
-            print(f"[WEB3] ✅ TX Hash: {tx_hash.hex()}")
-        except Exception as e:
-            # We Expect this to throw "insufficient funds" for unfunded burners!
-            print(f"[WEB3] Expected Live Network Rejection: {e}")
-            assert "insufficient funds" in str(e).lower() or "intrinsic gas" in str(e).lower()
-            print("[WEB3] ✅ Live Network Rejection Verified! The pipeline works.")
+        # We are going to trigger a real state-changing transaction on the live testnet!
+        # Simulating payment: Transferring 1 wei of WAIB Token to the BME Contract.
+        token_contract = w3.eth.contract(address=w3.to_checksum_address(UTILITY_TOKEN_ADDRESS), abi=ERC20_ABI)
+        
+        tx = token_contract.functions.transfer(
+            w3.to_checksum_address(BME_ADDRESS),
+            0
+        ).build_transaction({
+            'from': account.address,
+            'gas': 100000,
+            'gasPrice': w3.eth.gas_price,
+            'nonce': w3.eth.get_transaction_count(account.address),
+            'chainId': 421614
+        })
+        
+        signed_tx = w3.eth.account.sign_transaction(tx, private_key=BURNER_PRIVATE_KEY)
+        print("[WEB3] Transaction Signed. Sending raw transaction...")
+        tx_hash = w3.eth.send_raw_transaction(signed_tx.raw_transaction)
+        print(f"[WEB3] ✅ TX Hash: {tx_hash.hex()}")
+        
+        print("[WEB3] Waiting for transaction to be mined...")
+        receipt = w3.eth.wait_for_transaction_receipt(tx_hash, timeout=120)
+        
+        if receipt.status == 1:
+            print("[WEB3] ✅ Transaction Mined Successfully! Complete Web3 Settlement Verified.")
+        else:
+            print("[WEB3] ❌ Transaction Failed on-chain.")
+            assert False, "Transaction reverted."
     else:
-        print("[WARN] ARBITRUM_RPC_URL or BURNER_PRIVATE_KEY missing. Simulating Arbitrum connection.")
+        print("[WARN] Environment variables missing. Simulating Arbitrum connection.")
         
     await asyncio.sleep(1)
     
