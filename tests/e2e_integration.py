@@ -138,13 +138,17 @@ async def live_gcp_spot_instance():
 
 
 def generate_with_waterfall(prompt: str):
-    """Battle-tested Gemini Waterfall Logic using google.genai SDK."""
-    if not GEMINI_API_KEY:
-        print("[WARN] GEMINI_API_KEY missing. Simulating Agent Inference.")
+    """Battle-tested Gemini Waterfall Logic routing strictly through Vertex AI (Agent API)."""
+    if not PROJECT_ID:
+        print("[WARN] GCP_PROJECT_ID missing. Simulating Agent Inference.")
         return "Simulated Proof Payload"
         
-    client = genai.Client(api_key=GEMINI_API_KEY)
-    waterfall_sequence = ["gemini-2.5-pro", "gemini-2.5-flash", "gemini-1.5-pro", "gemini-1.5-flash"]
+    # Crucial Fix: Use vertexai=True to ensure billing goes exclusively through GCP 
+    # (Uses Application Default Credentials, NO API KEY REQUIRED!)
+    client = genai.Client(vertexai=True, project=PROJECT_ID, location="us-central1")
+    
+    # Vertex AI model names (no 'gemini-' prefix is needed for some, but standard is fine)
+    waterfall_sequence = ["gemini-1.5-pro", "gemini-1.5-flash"]
     
     for model_name in waterfall_sequence:
         print(f"[VERTEX AI] Attempting inference with {model_name}...")
@@ -161,7 +165,7 @@ def generate_with_waterfall(prompt: str):
                 print(f"[VERTEX AI] ⚠️ QUOTA EXHAUSTED for {model_name}. Cascading...")
                 continue
             elif "404" in err_msg or "not found" in err_msg:
-                print(f"[VERTEX AI] ⚠️ Model {model_name} not available in this region. Cascading...")
+                print(f"[VERTEX AI] ⚠️ Model {model_name} not available in us-central1. Cascading...")
                 continue
             else:
                 print(f"[VERTEX AI] ❌ Unexpected API Error with {model_name}: {e}. Cascading...")
