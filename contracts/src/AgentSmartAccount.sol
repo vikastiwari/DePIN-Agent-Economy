@@ -7,11 +7,14 @@ interface IERC20 {
 
 contract AgentSmartAccount {
     address public owner;
+    uint256 public dailyAllowance;
+    mapping(uint256 => uint256) public dailySpent;
 
     event PaymentExecuted(address indexed token, address indexed recipient, uint256 amount);
 
-    constructor(address _owner) {
+    constructor(address _owner, uint256 _dailyAllowance) {
         owner = _owner;
+        dailyAllowance = _dailyAllowance;
     }
 
     modifier onlyOwner() {
@@ -21,12 +24,16 @@ contract AgentSmartAccount {
 
     /**
      * @dev Executes a payment of ERC20 tokens to a recipient.
-     * In an EIP-7702 context, this contract code would reside at the EOA's address,
-     * allowing the EOA to natively execute this logic.
+     * Enforces a strict daily allowance to protect the delegating EOA.
      */
     function executePayment(address token, address recipient, uint256 amount) external onlyOwner returns (bool) {
         require(token != address(0), "Invalid token");
         require(recipient != address(0), "Invalid recipient");
+        
+        uint256 currentDay = block.timestamp / 1 days;
+        require(dailySpent[currentDay] + amount <= dailyAllowance, "Exceeds daily allowance");
+        
+        dailySpent[currentDay] += amount;
         
         bool success = IERC20(token).transfer(recipient, amount);
         require(success, "Transfer failed");

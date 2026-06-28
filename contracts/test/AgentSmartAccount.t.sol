@@ -24,11 +24,12 @@ contract AgentSmartAccountTest is Test {
     MockERC20 public token;
     address public owner;
     address public recipient;
+    uint256 public constant DAILY_ALLOWANCE = 10 ether;
 
     function setUp() public {
         owner = address(this);
         recipient = address(0x123);
-        account = new AgentSmartAccount(owner);
+        account = new AgentSmartAccount(owner, DAILY_ALLOWANCE);
         token = new MockERC20();
         
         // Fund the smart account with mock tokens
@@ -54,6 +55,22 @@ contract AgentSmartAccountTest is Test {
         // Change caller to someone other than owner
         vm.prank(address(0x456));
         vm.expectRevert("Unauthorized");
+        account.executePayment(address(token), recipient, 1 ether);
+    }
+
+    function testExecutePaymentExceedsAllowance() public {
+        // Attempt to transfer more than the daily allowance
+        vm.expectRevert("Exceeds daily allowance");
+        account.executePayment(address(token), recipient, 15 ether);
+    }
+
+    function testExecutePaymentMultipleExceedsAllowance() public {
+        // Transfer up to the limit
+        account.executePayment(address(token), recipient, 5 ether);
+        account.executePayment(address(token), recipient, 5 ether);
+
+        // Third transfer should fail
+        vm.expectRevert("Exceeds daily allowance");
         account.executePayment(address(token), recipient, 1 ether);
     }
 }
