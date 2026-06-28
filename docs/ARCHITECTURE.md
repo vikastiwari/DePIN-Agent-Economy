@@ -18,11 +18,11 @@ The Web3 AI Agent Economy architecture is highly decoupled, isolating computatio
   - **Arbitrum Stylus:** The verifier is written in `#[no_std]` Rust and compiled to WASM. It utilizes Montgomery Multiplication for modular arithmetic to bypass EVM gas limits, measuring costs in highly efficient "ink" rather than traditional EVM gas.
 
 ### 3. Agentic Networking & Payments (x402 & EIP-7702)
-- **Framework:** HTTP, ERC-4337 Paymasters, EIP-7702.
+- **Framework:** HTTP, ERC-4337 Paymasters, EIP-7702, `eth_account`.
 - **Mechanism:** 
   - When Agent A requests data from Agent B, Agent B responds with HTTP 402 and an x402 authorization payload. 
-  - Agent A uses its EIP-7702 delegated smart account session key (Transaction type 0x04) to sign a gasless batch transaction.
-  - The payment flows through an ERC-4337 Arbitrum paymaster, automatically participating in the Burn-and-Mint Equilibrium (BME) tokenomics model.
+  - Agent A uses its EIP-7702 delegated smart account session key (Transaction type 0x04) to sign a gasless batch transaction, governed strictly by an immutable `dailyAllowance` to prevent exploitation.
+  - The payment flows through an ERC-4337 Arbitrum paymaster, automatically participating in the Burn-and-Mint Equilibrium (BME) tokenomics model (`BME.sol`) which mathematically enforces supply deflation.
 
 ### 4. Testing & Verification Methodology (TDD)
 - **Framework:** `pytest` (Python), `forge test` (Foundry/Solidity), and `cargo test` (Rust).

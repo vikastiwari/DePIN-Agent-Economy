@@ -9,7 +9,7 @@ Agents communicate primarily over standard HTTP, utilizing the HTTP 402 "Payment
 1. **Agent A** sends `GET /inference_data` to **Agent B**.
 2. **Agent B** returns `402 Payment Required` with the header `WWW-Authenticate: x402 <base64_encoded_instructions>`.
 3. The instructions contain: `amount`, `token_address`, `recipient_address`, `network`.
-4. **Agent A** uses EIP-7702 (Transaction type 0x04) to temporarily delegate its Externally Owned Account (EOA) execution to a smart contract, authorizing the specific stablecoin spend without risking its main wallet funds.
+4. **Agent A** uses EIP-7702 (Transaction type 0x04) to temporarily delegate its Externally Owned Account (EOA) execution to a smart contract (`AgentSmartAccount.sol`). This authorizes the specific stablecoin spend but is strictly gated by a hardcoded `dailyAllowance` to eliminate runaway loop risks.
 5. **Agent A** retries the request with header `x402-signature: <cryptographic_signature>`.
 6. **Agent B** verifies the signature against the blockchain and returns `200 OK`.
 
