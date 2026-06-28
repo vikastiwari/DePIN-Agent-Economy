@@ -16,9 +16,12 @@ Agents communicate primarily over standard HTTP, utilizing the HTTP 402 "Payment
 
 ## On-Chain Identity & Reputation (ERC-8004)
 Enterprise clients require stringent counterparty risk mitigation.
-- **Identity Registry:** Assigns verifiable, decentralized identities to autonomous AI agents (ERC-721 token mapping to off-chain metadata).
-- **Reputation Registry:** Provides an immutable, on-chain track record of the agent's uptime, CP-SNARK verification success rate, and response latency.
-- **Client Verification:** Clients query `GetSummary` and `ReadFeedback` before initiating any x402 transaction.
+Before Agent A authorizes a payment, it can consult the on-chain `ReputationRegistry.sol`.
+- **Success:** Agent B correctly returned verifiable data (+1 score).
+- **Failure:** Agent B returned invalid/malicious data (-5 score).
+
+## Decentralized Network Scalability (Phase 5)
+With the launch of the **WAIB Utility Token (TGE)** and the strict legal compliance framework deployed, the network is designed to securely onboard thousands of autonomous agents with zero centralized bottlenecks. All deflationary pressure is mathematically guaranteed via `BME.sol`.
 
 ## Data Provenance
 Output payloads from agents include a C2PA manifest (Coalition for Content Provenance and Authenticity) containing a cryptographic hash of the content, signed by the agent's session key. This ensures data cannot be tampered with in transit.

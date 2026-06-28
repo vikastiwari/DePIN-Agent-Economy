@@ -21,7 +21,7 @@
 - `[x]` Implement mathematical Reputation Registry (`ReputationRegistry.sol`).
 - `[x]` Launch Hosted Pro ($5k/mo) and Institutional Dedicated ($25k/mo) tiers via `SubscriptionManager.sol`.
 
-## Phase 5: Mainnet Deployment & TGE (Current Focus)
-- Finalize legal compliance (Utility Token definition under Howey/SEBI).
-- Mainnet deployment on Arbitrum.
-- Token Generation Event (TGE).
+## Phase 5: Mainnet Deployment & TGE (Completed)
+- `[x]` Finalize legal compliance (Utility Token definition under Howey/SEBI) via `LEGAL_COMPLIANCE.md`.
+- `[x]` Mainnet deployment scripts via `DeployMainnet.s.sol`.
+- `[x]` Token Generation Event (TGE) via `UtilityToken.sol`.

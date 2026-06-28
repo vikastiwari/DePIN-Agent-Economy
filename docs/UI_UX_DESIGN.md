@@ -9,6 +9,7 @@ If a web frontend is built to monitor the agent swarm or compute nodes, it must 
 - **Aesthetic:** Dark Mode by default. "Glassmorphism" elements for data cards, neon accent colors (Arbitrum Blue, Solana Green) to highlight active transactions, and subtle micro-animations for real-time blockchain event streams.
 - **Data Density:** High. Operators need to see live TPS (Transactions Per Second), agent wallet balances, active compute node metrics (GPU utilization, temperatures via GCP APIs), x402 payment streams, and real-time BME Tokenomics deflation tracking (burned vs. minted tokens).
 - **SaaS Portal:** A dedicated view for Enterprise Clients to monitor their $5k/$25k active Subscriptions and audit the transparent Reputation Scores of the AI nodes processing their data.
+- **TGE Claims Dashboard (Phase 5):** A seamless portal for Node Operators to claim their dynamically minted WAIB tokens directly from the `BME.sol` smart contract.
 
 ## Agent CLI (Command Line Interface)
 For operators spinning up compute nodes or orchestrating agents via SSH into GCP:

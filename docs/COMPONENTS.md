@@ -9,6 +9,8 @@
 - **Agent Identity (`AgentIdentity.sol`):** ERC-721 ledger minting verifiable NFT identities for GCP nodes.
 - **Reputation Registry (`ReputationRegistry.sol`):** Attached to the identity, strictly penalizes bad actors (-5) and rewards success (+1).
 - **Subscription Manager (`SubscriptionManager.sol`):** Handles $5k (Shared) and $25k (Dedicated) B2B SaaS tiers via stablecoins.
+- **Utility Token (`UtilityToken.sol`):** The WAIB ERC-20 token. Minting is strictly governed by `BME.sol`.
+- **Mainnet Deployer (`script/DeployMainnet.s.sol`):** Automates the 6-contract deployment sequence.
 
 ## 2. Agent Network (`/agent`)
 - **Orchestrator (`orchestrator.py`):** The LangGraph state machine that manages the agent's logic loop (reasoning, tool selection, data fetching).

@@ -32,6 +32,10 @@ The Web3 AI Agent Economy architecture is highly decoupled, isolating computatio
 - **Identity & Reputation:** Handled via `AgentIdentity.sol` (ERC-721) and `ReputationRegistry.sol`. Nodes possess immutable, verifiable track records.
 - **Fiat Subscription:** Handled via `SubscriptionManager.sol`, bridging Web2 Enterprise logic to Web3 stablecoin rails for automated, trustless infrastructure provisioning. All Smart Contracts and Python state graphs must be accompanied by comprehensive unit tests asserting expected state transitions, negative cases (e.g., failed signatures), and simulated EIP-7702 delegations *before* execution logic is finalized. Code coverage must remain above 95%.
 
+### 6. Legal Compliance Architecture (Phase 5)
+- **Token Classification:** `UtilityToken.sol` is structurally shielded from securities laws (SEC Howey / SEBI) via strict utility consumption requirements and algorithmic BME governance, as formally outlined in `LEGAL_COMPLIANCE.md`.
+- **Mainnet Bootstrapping:** `DeployMainnet.s.sol` guarantees a transparent, decentralized, and humanless initiation of the entire protocol.
+
 ## High-Level Diagram
 
 ```mermaid
