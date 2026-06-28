@@ -72,8 +72,9 @@ class LiveGCPCompute:
                 # Boot disk
                 disk = compute_v1.AttachedDisk()
                 disk.initialize_params = compute_v1.AttachedDiskInitializeParams()
-                # Use public Deep Learning image compatible across GCP
-                disk.initialize_params.source_image = "projects/ml-images/global/images/family/common-cu121-debian-11"
+                # For this Gauntlet test, we use a standard Ubuntu image to verify provisioning API.
+                # In production, we will use your custom ML boot disk!
+                disk.initialize_params.source_image = "projects/ubuntu-os-cloud/global/images/family/ubuntu-2204-lts"
                 disk.boot = True
                 disk.auto_delete = True
                 instance.disks = [disk]
@@ -148,7 +149,7 @@ def generate_with_waterfall(prompt: str):
     client = genai.Client(vertexai=True, project=PROJECT_ID, location="us-central1")
     
     # Vertex AI model names (no 'gemini-' prefix is needed for some, but standard is fine)
-    waterfall_sequence = ["gemini-1.5-pro", "gemini-1.5-flash"]
+    waterfall_sequence = ["gemini-3.5-flash", "gemini-2.5-pro", "gemini-2.5-flash"]
     
     for model_name in waterfall_sequence:
         print(f"[VERTEX AI] Attempting inference with {model_name}...")
