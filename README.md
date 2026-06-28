@@ -1,16 +1,20 @@
-# Web3 AI Agent Economy
+# Web3 AI Agent Economy 
 
-An Agentic Decentralized Physical Infrastructure Network (DePIN) powered by zkML and Intent-Centric Smart Accounts.
+![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)
+![Status: Phase 2](https://img.shields.io/badge/Status-Phase%202%20(Foundry%20TDD)-success.svg)
+![Architecture: Rust/WASM](https://img.shields.io/badge/Architecture-Rust%2FWASM%20(Arbitrum%20Stylus)-orange)
+
+An Agentic Decentralized Physical Infrastructure Network (DePIN) powered by Zero-Knowledge Machine Learning (zkML) and Intent-Centric Smart Accounts.
 
 ## Vision
-The Web3 AI Agent Economy replaces human-centric financial protocols with autonomous, machine-driven ecosystems. AI agents hold their own wallets, negotiate via the x402 protocol, and execute verifiable machine learning operations on-chain using Artemis CP-SNARKs.
+The Web3 AI Agent Economy framework is engineered to replace human-centric financial protocols with autonomous, machine-driven ecosystems. Autonomous AI agents manage cryptographic wallets, negotiate via the x402 HTTP protocol, and execute verifiable machine learning operations on-chain utilizing Artemis Commit-and-Prove SNARKs (CP-SNARKs).
 
-## Core Features
-- **Zero-Knowledge Machine Learning (zkML):** Uses Artemis CP-SNARKs on Arbitrum Stylus (Rust/WASM) to mathematically prove AI model execution on-chain without revealing model weights.
-- **Decentralized Compute (BlockTrain):** Spreads heavy AI inference across heterogeneous hardware (GCP GKE) using a block-local diffusion objective.
-- **Agentic Financial Autonomy:** Agents utilize EIP-7702 (Session Keys) and x402 (HTTP 402 "Payment Required") to execute gasless micro-transactions in stablecoins.
-- **Deflationary Tokenomics:** Implements a Burn-and-Mint Equilibrium (BME) paired with Proof of Useful Work, ensuring long-term systemic value accrual without speculative inflation.
-- **Immutable Identity (ERC-8004):** Agents are registered via trustless registries, securing an NFT-based identity and a robust on-chain reputation ledger for enterprise B2B compliance.
+## Architectural Pillars
+- **Zero-Knowledge Machine Learning (zkML):** Leverages Artemis CP-SNARKs compiled to Arbitrum Stylus (Rust/WASM) to mathematically verify AI model inference on-chain without compromising proprietary model weights.
+- **Distributed Inference (BlockTrain):** Distributes high-parameter AI inference workloads across heterogeneous hardware clusters (GCP GKE) employing a block-local diffusion objective.
+- **Agentic Financial Autonomy:** Agents utilize EIP-7702 (Session Keys) and the x402 protocol (HTTP 402 "Payment Required") to execute gasless micro-transactions in stablecoins.
+- **Deflationary Tokenomics:** Implements a Burn-and-Mint Equilibrium (BME) paired with Proof of Useful Work, ensuring long-term systemic value accrual driven by verifiable compute.
+- **Immutable Identity (ERC-8004):** Agents are authenticated via trustless registries, securing an NFT-based identity and an immutable on-chain reputation ledger to satisfy enterprise B2B compliance requirements.
 
 ## Quick Start
 *See `docs/DETAILED_ROADMAP.md` for our current implementation phase.*
