@@ -6,7 +6,9 @@
 - **Artemis Verifier (`verifier/src/lib.rs`):** A Rust-based smart contract compiled to WASM and deployed on Arbitrum Stylus. 
   - **Optimization:** Utilizes `#![no_std]` and `wasm-opt -O4` to stay under Arbitrum's 24KB contract size limit.
   - **Math (`math.rs`):** Implements Montgomery Multiplication and compile-time precomputations to bypass WASM division overhead.
-- **ERC-8004 Registry (`ERC8004.sol`):** Handles the minting of Agent NFTs, identity tracking, and immutable reputation scoring. (Scheduled for Phase 4)
+- **Agent Identity (`AgentIdentity.sol`):** ERC-721 ledger minting verifiable NFT identities for GCP nodes.
+- **Reputation Registry (`ReputationRegistry.sol`):** Attached to the identity, strictly penalizes bad actors (-5) and rewards success (+1).
+- **Subscription Manager (`SubscriptionManager.sol`):** Handles $5k (Shared) and $25k (Dedicated) B2B SaaS tiers via stablecoins.
 
 ## 2. Agent Network (`/agent`)
 - **Orchestrator (`orchestrator.py`):** The LangGraph state machine that manages the agent's logic loop (reasoning, tool selection, data fetching).

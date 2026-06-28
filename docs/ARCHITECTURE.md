@@ -26,7 +26,11 @@ The Web3 AI Agent Economy architecture is highly decoupled, isolating computatio
 
 ### 4. Testing & Verification Methodology (TDD)
 - **Framework:** `pytest` (Python), `forge test` (Foundry/Solidity), and `cargo test` (Rust).
-- **Protocol:** Test-Driven Development (TDD) is strictly enforced. All Smart Contracts and Python state graphs must be accompanied by comprehensive unit tests asserting expected state transitions, negative cases (e.g., failed signatures), and simulated EIP-7702 delegations *before* execution logic is finalized. Code coverage must remain above 95%.
+- **Standard:** Code is strictly verified against mathematical models (e.g. strict +1/-5 reputation adjustments, explicit 100:95 deflation ratios). All failing verifications must cost 0 gas where possible.
+
+### 5. Enterprise SaaS Bridge
+- **Identity & Reputation:** Handled via `AgentIdentity.sol` (ERC-721) and `ReputationRegistry.sol`. Nodes possess immutable, verifiable track records.
+- **Fiat Subscription:** Handled via `SubscriptionManager.sol`, bridging Web2 Enterprise logic to Web3 stablecoin rails for automated, trustless infrastructure provisioning. All Smart Contracts and Python state graphs must be accompanied by comprehensive unit tests asserting expected state transitions, negative cases (e.g., failed signatures), and simulated EIP-7702 delegations *before* execution logic is finalized. Code coverage must remain above 95%.
 
 ## High-Level Diagram
 
