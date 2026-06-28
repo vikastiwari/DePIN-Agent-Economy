@@ -65,5 +65,6 @@ Before deploying to Mainnet, we must flawlessly execute the "Artemis Gauntlet" o
 Debugging GitHub Actions YAML files is painfully slow. Before pushing code to GitHub to trigger the automated CI/CD pipeline, perform a **Shadow Run**:
 1. Set your `.env` variables locally to point to the live GCP project and the live Arbitrum Sepolia RPC.
 2. Run `pytest tests/e2e_integration.py` directly from your WSL terminal.
-3. Verify that the GCP L4 instance actually spins up in your GCP Console, runs the inference, broadcasts to the live Arbitrum testnet block explorer, and cleanly terminates itself.
-4. Only once the Shadow Run passes flawlessly should you commit and push to trigger the GitHub Action.
+3. **Vertex API Integration:** Verify that the GCP L4 instance successfully routes the inference payload through the **Vertex API (Agent API)**, securely generating the Artemis CP-SNARK proof.
+4. Verify the on-chain settlement broadcasts successfully to the live Arbitrum testnet block explorer, and the GCP node cleanly terminates itself.
+5. Only once the Shadow Run passes flawlessly should you commit and push to trigger the GitHub Action.

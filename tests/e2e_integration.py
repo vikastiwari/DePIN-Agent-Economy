@@ -62,9 +62,9 @@ async def test_artemis_gauntlet(gcp_spot_instance):
     assert instance.instance_id == "l4-spot-node-001"
     
     # 2. Simulate off-chain inference and proof generation (prover.py)
-    print(f"Running Llama-3-8B Inference on {instance.instance_id}...")
+    print(f"Routing Inference through Vertex API (Agent API) from {instance.instance_id}...")
     await asyncio.sleep(1)
-    print("Inference Complete. Generating Artemis CP-SNARK...")
+    print("Vertex API Inference Complete. Generating Artemis CP-SNARK...")
     mock_proof = "0x" + "a" * 64
     assert mock_proof.startswith("0x")
 
