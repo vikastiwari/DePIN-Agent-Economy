@@ -23,15 +23,17 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Authenticate to Google Cloud (OIDC)
-        id: auth
-        uses: google-github-actions/auth@v2
-        with:
-          workload_identity_provider: 'projects/123456789/locations/global/workloadIdentityPools/github-actions-pool/providers/github'
-          service_account: 'artemis-ci@web3-ai-agent-economy.iam.gserviceaccount.com'
+      # [TODO]: Uncomment and configure this block when real GCP infrastructure is provisioned.
+      # You will need to create the Workload Identity Pool in GCP and store the Provider ID and Service Account in GitHub Secrets.
+      # - name: Authenticate to Google Cloud (OIDC)
+      #   id: auth
+      #   uses: google-github-actions/auth@v2
+      #   with:
+      #     workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+      #     service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
           
-      - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v2
+      # - name: Set up Cloud SDK
+      #   uses: google-github-actions/setup-gcloud@v2
 
       - name: Install Python Dependencies
         run: |
